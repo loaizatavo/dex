@@ -10,76 +10,65 @@ import CoreData
 
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
-
+    
     @FetchRequest(
-        sortDescriptors: [NSSortDescriptor(keyPath: \Item.timestamp, ascending: true)],
+        sortDescriptors: [NSSortDescriptor(keyPath: \Pokemnon.name, ascending: true)],
         animation: .default)
-    private var items: FetchedResults<Item>
-
+    private var pokemnon: FetchedResults<Pokemnon>
+    
     var body: some View {
         NavigationView {
             List {
-                ForEach(items) { item in
+                ForEach(pokemnon) { pokemon in
                     NavigationLink {
-                        Text("Item at \(item.timestamp!, formatter: itemFormatter)")
+                        Text(pokemon.name ?? "Unknown")
                     } label: {
-                        Text(item.timestamp!, formatter: itemFormatter)
+                        Text(pokemon.name ?? "Unknown")
                     }
                 }
-                .onDelete(perform: deleteItems)
+                .onDelete(perform: deletePokemnon)
             }
             .toolbar {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     EditButton()
                 }
                 ToolbarItem {
-                    Button(action: addItem) {
-                        Label("Add Item", systemImage: "plus")
+                    Button(action: addPokemnon) {
+                        Label("Add Pokemon", systemImage: "plus")
                     }
                 }
             }
-            Text("Select an item")
+            Text("Select a Pokemon")
         }
     }
-
-    private func addItem() {
+    
+    private func addPokemnon() {
         withAnimation {
-            let newItem = Item(context: viewContext)
-            newItem.timestamp = Date()
-
+            let newPokemon = Pokemnon(context: viewContext)
+            newPokemon.name = "Pokemon #\(Int.random(in: 1...1000))"
+            newPokemon.id = Int16.random(in: 1...1000)
+            // Set other properties as needed
             do {
                 try viewContext.save()
             } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
                 let nsError = error as NSError
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
         }
     }
-
-    private func deleteItems(offsets: IndexSet) {
+    
+    private func deletePokemnon(offsets: IndexSet) {
         withAnimation {
-            offsets.map { items[$0] }.forEach(viewContext.delete)
-
+            offsets.map { pokemnon[$0] }.forEach(viewContext.delete)
             do {
                 try viewContext.save()
             } catch {
-                // Replace this implementation with code to handle the error appropriately.
-                // fatalError() causes the application to generate a crash log and terminate. You should not use this function in a shipping application, although it may be useful during development.
                 let nsError = error as NSError
                 fatalError("Unresolved error \(nsError), \(nsError.userInfo)")
             }
         }
     }
 }
-
-private let itemFormatter: DateFormatter = {
-    let formatter = DateFormatter()
-    formatter.dateStyle = .short
-    formatter.timeStyle = .medium
-    return formatter
-}()
 
 #Preview {
     ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
