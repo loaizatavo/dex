@@ -15,7 +15,7 @@ struct PersistenceController {
         let result = PersistenceController(inMemory: true)
         let viewContext = result.container.viewContext
         
-        let newPokemon = Pokemnon(context: viewContext)
+        let newPokemon = Pokemon(context: viewContext)
         newPokemon.id = 1
         newPokemon.name = "bulbasaur"
         newPokemon.types = ["grass", "poison"]
@@ -46,9 +46,11 @@ struct PersistenceController {
         }
         container.loadPersistentStores(completionHandler: { (storeDescription, error) in
             if let error = error as NSError? {
-                fatalError("Unresolved error \(error), \(error.userInfo)")
+                print(error)
             }
         })
+
+        container.viewContext.mergePolicy = NSMergePolicy.mergeByPropertyStoreTrump
         container.viewContext.automaticallyMergesChangesFromParent = true
     }
 }
