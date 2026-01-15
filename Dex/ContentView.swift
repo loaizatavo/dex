@@ -11,6 +11,8 @@ import CoreData
 struct ContentView: View {
     @Environment(\.managedObjectContext) private var viewContext
     
+    @FetchRequest<Pokemon>(sortDescriptors: []) private var all
+    
     @FetchRequest(
         sortDescriptors: [NSSortDescriptor(keyPath: \Pokemon.id, ascending: true)],
         animation: .default)
@@ -48,7 +50,7 @@ struct ContentView: View {
     let fetcher = FetchService()
     
     var body: some View {
-        if pokedex.isEmpty {
+        if all.isEmpty {
             ContentUnavailableView {
                 Label("No Pokemon", image: .nopokemon)
             } description: {
@@ -104,9 +106,21 @@ struct ContentView: View {
                                 }
                                 // Text(pokemon.name ?? "no name")
                             }
+                            .swipeActions(edge: .leading) {
+                                Button(pokemon.favorite ? "Remove from favorites" : "Add to favorites", systemImage: "star") {
+                                    
+                                    pokemon.favorite.toggle()
+                                    do {
+                                        try viewContext.save()
+                                    } catch {
+                                        print(error)
+                                    }
+                                }
+                                .tint(pokemon.favorite ? .gray : .yellow)
+                            }
                         }
                     } footer: {
-                        if (pokedex.count < 151) {
+                        if (all.count < 151) {
                             ContentUnavailableView {
                                 Label("Missing pokemon", image: .nopokemon)
                             } description: {
@@ -115,7 +129,7 @@ struct ContentView: View {
                                 Button("Fetch pokemon", systemImage: "antena.radiowaves.leftandright") {
                                     getPokemon(from: pokedex.count + 1)
                                 }
-                                .buttonStyle(.borderedProminent)
+                                .buttonStyle(.borderedProminent) 
                             }
                         }
                     }
@@ -187,3 +201,4 @@ struct ContentView: View {
 #Preview {
     ContentView().environment(\.managedObjectContext, PersistenceController.preview.container.viewContext)
 }
+
