@@ -144,8 +144,9 @@ struct ContentView: View {
                     pokedex.nsPredicate = dynamicPredicate
                 }
                 .navigationDestination(for: Pokemon.self) { pokemon in
-                    // here is the design of the content for every list item
-                    Text(pokemon.name ?? "no name")
+                    // Pass the pokemon from core data in an environment object
+                    PokemonDetailView()
+                        .environmentObject(pokemon)
                 }
                 .toolbar {
                     ToolbarItem(placement: .navigationBarTrailing) {
