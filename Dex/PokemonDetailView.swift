@@ -19,7 +19,7 @@ struct PokemonDetailView: View {
     var body: some View {
         ScrollView {
             ZStack{
-                Image(.normalgrasselectricpoisonfairy)
+                Image(pokemon.background)
                     .interpolation(.none)
                     .resizable()
                     .scaledToFit()
