@@ -17,8 +17,8 @@ struct FetchedPokemon: Decodable {
     let specialAttack: Int16
     let specialDefense: Int16
     let speed: Int16
-    let sprite: URL
-    let shiny: URL
+    let spriteURL: URL
+    let shinyURL: URL
     
     enum CodingKeys: CodingKey {
         case id
@@ -43,8 +43,8 @@ struct FetchedPokemon: Decodable {
          * Use the raw value
          */
         enum SpriteDictionaryKeys: String, CodingKey {
-            case sprite  = "frontDefault"
-            case shiny = "frontShiny"
+            case spriteURL  = "frontDefault"
+            case shinyURL = "frontShiny"
         }
         
         
@@ -98,7 +98,7 @@ struct FetchedPokemon: Decodable {
         
         
         var spriteContainer = try container.nestedContainer(keyedBy: CodingKeys.SpriteDictionaryKeys.self, forKey: .sprites)
-        sprite = try spriteContainer.decode(URL.self, forKey: .sprite)
-        shiny = try spriteContainer.decode(URL.self, forKey: .shiny)
+        spriteURL = try spriteContainer.decode(URL.self, forKey: .spriteURL)
+        shinyURL = try spriteContainer.decode(URL.self, forKey: .shinyURL)
     }
 }
