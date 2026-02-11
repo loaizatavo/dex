@@ -14,6 +14,7 @@ struct PersistenceController {
     static var previewPokemon: Pokemon {
         let decoder = JSONDecoder()
         
+        
         decoder .keyDecodingStrategy = .convertFromSnakeCase
         
         let pokemonData = try! Data(contentsOf: Bundle.main.url(forResource: "samplepokemon", withExtension: "json")!)
