@@ -17,6 +17,7 @@ struct FetchService {
     func fetchPokemon(_ id: Int) async throws -> Pokemon {
         let fetchURL = baseURL.appending(path: String(id))
         
+        
         let (data, response) = try await URLSession.shared.data(from: fetchURL)
         
         guard let response = response as? HTTPURLResponse, response.statusCode == 200 else {
