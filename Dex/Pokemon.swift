@@ -116,6 +116,7 @@ import SwiftUI
         } else {
             Image(.bulbasaur)
         }
+        
     }
     
     @MainActor
