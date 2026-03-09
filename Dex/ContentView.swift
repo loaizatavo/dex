@@ -16,21 +16,18 @@ struct ContentView: View {
     @State private var searchText = ""
     @State private var filterByFavorites = false
     
-    private var dynamicPredicate: NSPredicate {
-        var predicates: [NSPredicate] = []
-        
-        // Search predicate
-        if !searchText.isEmpty {
-            predicates.append(NSPredicate(format: "name CONTAINS[c] %@", searchText))
+    private var dynamicPredicate: Predicate<Pokemon> {
+        #Predicate<Pokemon> { pokemon in
+            if filterByFavorites && !searchText.isEmpty {
+                pokemon.favorite && pokemon.name.localizedStandardContains(searchText)
+            } else if filterByFavorites {
+                pokemon.favorite
+            } else if !searchText.isEmpty {
+                pokemon.name.localizedStandardContains(searchText)
+            } else {
+                true
+            }
         }
-        
-        // Filter by favorite predicate
-        if filterByFavorites {
-            predicates.append(NSPredicate(format: "favorite == %d", true))
-        }
-        
-        // Combine predicates
-        return NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
     }
     
     let fetcher = FetchService()
@@ -69,7 +66,7 @@ struct ContentView: View {
         NavigationStack {
             List {
                 Section {
-                    ForEach(pokedex) { pokemon in
+                    ForEach((try? pokedex.filter(dynamicPredicate)) ?? pokedex) { pokemon in
                         NavigationLink(value: pokemon) {
                             rowContent(for: pokemon)
                         }
@@ -107,6 +104,7 @@ struct ContentView: View {
             .navigationTitle("Pokedex")
             .searchable(text: $searchText, placement: .automatic, prompt: "Find a pokemon")
             .autocorrectionDisabled(true)
+            .animation(.default, value: searchText)
             .navigationDestination(for: Pokemon.self) { pokemon in
                 PokemonDetailView(pokemon: pokemon)
             }
